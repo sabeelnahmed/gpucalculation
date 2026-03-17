@@ -28,21 +28,21 @@ const tokenAverages = {
   custom: { input: 2000, output: 500 },
 }
 
-const userPresets = [1, 5, 10, 25, 50, 100, 250, 500, 1000]
-const userTicks = [1, 10, 50, 100, 200, 500, 1000]
+const userPresets = [1, 5, 10, 25, 50, 100, 250, 500, 1000, 5000, 10000]
+const userTicks = [1, 10, 50, 100, 500, 1000, 5000, 10000]
 const requestPresets = [5, 10, 25, 50, 100, 200, 500]
 const requestTicks = [1, 10, 50, 100, 200, 500]
 
 // ── Logarithmic mapping ──
 
 function valueToLog(value) {
-  // Maps 1–1000 to 0–1 logarithmically
-  return Math.log(value) / Math.log(1000)
+  // Maps 1–10000 to 0–1 logarithmically
+  return Math.log(value) / Math.log(10000)
 }
 
 function logToValue(pos) {
-  // Maps 0–1 to 1–1000 logarithmically
-  return Math.round(Math.max(1, Math.min(1000, Math.exp(pos * Math.log(1000)))))
+  // Maps 0–1 to 1–10000 logarithmically
+  return Math.round(Math.max(1, Math.min(10000, Math.exp(pos * Math.log(10000)))))
 }
 
 // ── Formatting ──
@@ -389,13 +389,13 @@ export default function ScaleScreen() {
                   Users actively querying the model at the same time
                 </div>
               </div>
-              <EditableNumber value={users} onChange={setUsers} min={1} max={1000} />
+              <EditableNumber value={users} onChange={setUsers} min={1} max={10000} />
             </div>
             <div style={{ height: '24px' }} />
             <CustomSlider
               value={users}
               min={1}
-              max={1000}
+              max={10000}
               onChange={setUsers}
               logarithmic
               ticks={userTicks}
