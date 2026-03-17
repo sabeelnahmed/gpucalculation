@@ -1,0 +1,359 @@
+{
+  "_metadata": {
+    "last_updated": "2026-03-17",
+    "version": "2.0",
+    "notes": "Unified file for the cost comparison section on Screen 6. Cloud GPU providers show cost of renting the SAME self-hosted model. API providers show cost of using a DIFFERENT closed-source model. Both are per-month calculations.",
+    "formulas": {
+      "cloud_gpu_monthly": "hourly_rate × num_gpus × monthly_hours (730 for 24/7, custom for business hours)",
+      "api_monthly": "(monthly_input_tokens / 1e6 × input_per_million) + (monthly_output_tokens / 1e6 × output_per_million)",
+      "monthly_tokens": {
+        "input": "concurrent_users × requests_per_day × 30 × avg_input_tokens_per_request",
+        "output": "concurrent_users × requests_per_day × 30 × avg_output_tokens_per_request"
+      }
+    },
+    "avg_tokens_by_use_case": {
+      "chatbot":        { "input": 1500, "output": 400 },
+      "knowledge":      { "input": 2000, "output": 500 },
+      "summarization":  { "input": 3000, "output": 500 },
+      "code":           { "input": 2000, "output": 800 },
+      "compliance":     { "input": 5000, "output": 1000 },
+      "arabic":         { "input": 1500, "output": 400 },
+      "batch":          { "input": 2000, "output": 300 },
+      "custom":         { "input": 2000, "output": 500 }
+    }
+  },
+
+  "cloud_gpu_providers": {
+    "_description": "Hourly rates per GPU. To calculate monthly: rate × num_gpus × hours. These providers rent you the GPU — you run your own model on it. Data stays in their infrastructure but under your control.",
+    "_note_for_ui": "Show brand color dot next to each provider name in the comparison chart.",
+
+    "aws": {
+      "name": "AWS",
+      "display_name": "Amazon Web Services",
+      "brand_color": "#FF9900",
+      "data_residency": "US, EU, Middle East (Bahrain), Asia",
+      "saudi_region": true,
+      "notes": "Closest region to KSA: me-south-1 (Bahrain). H100 on p5 instances.",
+      "hourly_rates": {
+        "h100_sxm": 3.93,
+        "h200_sxm": 10.60,
+        "a100_80gb": 3.93,
+        "l40s": 1.85,
+        "l4": 0.80
+      },
+      "min_gpus": {
+        "h100_sxm": 8,
+        "h200_sxm": 8,
+        "a100_80gb": 8,
+        "l40s": 1,
+        "l4": 1
+      },
+      "commitment_discounts": {
+        "1_year": "30-40% off",
+        "3_year": "50-60% off"
+      }
+    },
+
+    "azure": {
+      "name": "Azure",
+      "display_name": "Microsoft Azure",
+      "brand_color": "#0078D4",
+      "data_residency": "US, EU, Middle East (UAE, Qatar planned)",
+      "saudi_region": false,
+      "notes": "ND H100 v5 series. No Saudi region yet — UAE is closest.",
+      "hourly_rates": {
+        "h100_sxm": 6.98,
+        "a100_80gb": 3.67
+      },
+      "min_gpus": {
+        "h100_sxm": 1,
+        "a100_80gb": 1
+      }
+    },
+
+    "gcp": {
+      "name": "GCP",
+      "display_name": "Google Cloud Platform",
+      "brand_color": "#4285F4",
+      "data_residency": "US, EU, Middle East (Doha), Asia",
+      "saudi_region": false,
+      "notes": "Closest to KSA: me-west1 (Doha). A3 Mega for H100. G2 for L4.",
+      "hourly_rates": {
+        "h100_sxm": 3.00,
+        "h200_sxm": 3.72,
+        "a100_80gb": 3.67,
+        "l4": 0.70
+      },
+      "min_gpus": {
+        "h100_sxm": 8,
+        "h200_sxm": 8,
+        "a100_80gb": 1,
+        "l4": 1
+      },
+      "notes_pricing": "H200 rate is spot/preemptible — can be interrupted"
+    },
+
+    "lambda": {
+      "name": "Lambda",
+      "display_name": "Lambda Labs",
+      "brand_color": "#7B2FBE",
+      "data_residency": "US",
+      "saudi_region": false,
+      "notes": "Frequent capacity shortages. Good prices when available.",
+      "hourly_rates": {
+        "h100_sxm": 2.49,
+        "h200_sxm": 3.29,
+        "a100_80gb": 1.29,
+        "l40s": 0.94,
+        "b200_sxm": 5.49
+      },
+      "min_gpus": { "_all": 1 }
+    },
+
+    "coreweave": {
+      "name": "CoreWeave",
+      "display_name": "CoreWeave",
+      "brand_color": "#00C7B7",
+      "data_residency": "US, EU",
+      "saudi_region": false,
+      "hourly_rates": {
+        "h100_sxm": 2.23,
+        "h200_sxm": 3.49,
+        "a100_80gb": 1.21,
+        "l40s": 0.86
+      },
+      "min_gpus": { "_all": 1 }
+    },
+
+    "vast_ai": {
+      "name": "Vast.ai",
+      "display_name": "Vast.ai (marketplace)",
+      "brand_color": "#22C55E",
+      "data_residency": "Varies (distributed marketplace)",
+      "saudi_region": false,
+      "notes": "Marketplace pricing — cheapest but variable availability and no guarantees.",
+      "hourly_rates": {
+        "h100_sxm": 1.49,
+        "a100_80gb": 0.75,
+        "l40s": 0.40,
+        "rtx_4090": 0.34,
+        "rtx_5090": 0.50
+      },
+      "min_gpus": { "_all": 1 }
+    },
+
+    "runpod": {
+      "name": "RunPod",
+      "display_name": "RunPod",
+      "brand_color": "#673AB7",
+      "data_residency": "US, EU",
+      "saudi_region": false,
+      "hourly_rates": {
+        "h100_sxm": 2.49,
+        "rtx_4090": 0.69,
+        "rtx_5090": 0.89,
+        "rtx_6000_ada": 0.77
+      },
+      "min_gpus": { "_all": 1 }
+    },
+
+    "datacrunch": {
+      "name": "DataCrunch",
+      "display_name": "DataCrunch",
+      "brand_color": "#FF6B35",
+      "data_residency": "EU (Finland)",
+      "saudi_region": false,
+      "hourly_rates": {
+        "h100_sxm": 1.99,
+        "a100_80gb": 0.95,
+        "b200_sxm": 3.99
+      },
+      "min_gpus": { "_all": 1 }
+    },
+
+    "gmi_cloud": {
+      "name": "GMI Cloud",
+      "display_name": "GMI Cloud",
+      "brand_color": "#2196F3",
+      "data_residency": "US, Asia",
+      "saudi_region": false,
+      "hourly_rates": {
+        "h100_sxm": 2.10,
+        "h200_sxm": 2.50
+      },
+      "min_gpus": { "_all": 1 }
+    },
+
+    "oracle": {
+      "name": "Oracle",
+      "display_name": "Oracle Cloud",
+      "brand_color": "#F80000",
+      "data_residency": "US, EU, Middle East (Jeddah)",
+      "saudi_region": true,
+      "notes": "Has a Saudi region in Jeddah. Competitive GPU pricing.",
+      "hourly_rates": {
+        "a100_80gb": 2.95,
+        "h100_sxm": 3.50
+      },
+      "min_gpus": { "_all": 1 }
+    }
+  },
+
+  "api_providers": {
+    "_description": "Per-million-token pricing for closed-source API models. Using these means your data goes to the provider's servers. The comparison shows: for the same workload, what would it cost to use this API instead of self-hosting?",
+    "_note_for_ui": "Group by provider. Show input+output rate below the name. Gray color for all API bars since data leaves.",
+
+    "openai": {
+      "provider_name": "OpenAI",
+      "provider_color": "#10A37F",
+      "data_residency": "US (regional processing available at +10%)",
+      "models": {
+        "gpt-4o": {
+          "name": "GPT-4o",
+          "input_per_million": 2.50,
+          "output_per_million": 10.00,
+          "context_window": 128000,
+          "tier": "standard"
+        },
+        "gpt-4o-mini": {
+          "name": "GPT-4o Mini",
+          "input_per_million": 0.15,
+          "output_per_million": 0.60,
+          "context_window": 128000,
+          "tier": "budget"
+        },
+        "gpt-4.1": {
+          "name": "GPT-4.1",
+          "input_per_million": 2.00,
+          "output_per_million": 8.00,
+          "context_window": 1000000,
+          "tier": "standard"
+        },
+        "gpt-5.2": {
+          "name": "GPT-5.2",
+          "input_per_million": 1.75,
+          "output_per_million": 14.00,
+          "context_window": 128000,
+          "tier": "flagship"
+        },
+        "gpt-5-mini": {
+          "name": "GPT-5 Mini",
+          "input_per_million": 0.25,
+          "output_per_million": 2.00,
+          "context_window": 128000,
+          "tier": "budget"
+        }
+      }
+    },
+
+    "anthropic": {
+      "provider_name": "Anthropic",
+      "provider_color": "#D4A574",
+      "data_residency": "US, EU (US-only inference +10%)",
+      "models": {
+        "claude-sonnet-4.6": {
+          "name": "Claude Sonnet 4.6",
+          "input_per_million": 3.00,
+          "output_per_million": 15.00,
+          "context_window": 1000000,
+          "tier": "standard"
+        },
+        "claude-opus-4.6": {
+          "name": "Claude Opus 4.6",
+          "input_per_million": 5.00,
+          "output_per_million": 25.00,
+          "context_window": 1000000,
+          "tier": "flagship"
+        },
+        "claude-haiku-4.5": {
+          "name": "Claude Haiku 4.5",
+          "input_per_million": 0.80,
+          "output_per_million": 4.00,
+          "context_window": 200000,
+          "tier": "budget"
+        }
+      }
+    },
+
+    "google": {
+      "provider_name": "Google",
+      "provider_color": "#4285F4",
+      "data_residency": "US, EU, Middle East (Doha available)",
+      "models": {
+        "gemini-2.5-pro": {
+          "name": "Gemini 2.5 Pro",
+          "input_per_million": 1.25,
+          "output_per_million": 5.00,
+          "context_window": 2000000,
+          "tier": "standard"
+        },
+        "gemini-2.5-flash": {
+          "name": "Gemini 2.5 Flash",
+          "input_per_million": 0.15,
+          "output_per_million": 0.60,
+          "context_window": 1000000,
+          "tier": "budget"
+        },
+        "gemini-3.1-pro": {
+          "name": "Gemini 3.1 Pro",
+          "input_per_million": 2.00,
+          "output_per_million": 12.00,
+          "context_window": 2000000,
+          "tier": "flagship"
+        }
+      }
+    },
+
+    "deepseek": {
+      "provider_name": "DeepSeek",
+      "provider_color": "#1E88E5",
+      "data_residency": "China",
+      "models": {
+        "deepseek-v3-api": {
+          "name": "DeepSeek V3",
+          "input_per_million": 0.27,
+          "output_per_million": 1.10,
+          "context_window": 128000,
+          "tier": "budget"
+        },
+        "deepseek-r1-api": {
+          "name": "DeepSeek R1",
+          "input_per_million": 0.55,
+          "output_per_million": 2.19,
+          "context_window": 128000,
+          "tier": "standard"
+        }
+      }
+    },
+
+    "xai": {
+      "provider_name": "xAI",
+      "provider_color": "#1DA1F2",
+      "data_residency": "US",
+      "models": {
+        "grok-4.1": {
+          "name": "Grok 4.1",
+          "input_per_million": 0.20,
+          "output_per_million": 0.50,
+          "context_window": 131072,
+          "tier": "budget"
+        }
+      }
+    }
+  },
+
+  "self_hosted_costs": {
+    "_description": "Monthly operating costs for on-premise deployment. Used as the 'self-hosted' bar in the comparison.",
+    "formula": {
+      "monthly_power_sar": "(gpu_tdp_watts × num_gpus × pue × 730) / 1000 × electricity_sar_per_kwh",
+      "monthly_power_usd": "monthly_power_sar / 3.75"
+    },
+    "constants": {
+      "electricity_sar_per_kwh": 0.048,
+      "pue": 1.4,
+      "hours_per_month_24_7": 730,
+      "usd_to_sar": 3.75
+    },
+    "note": "Self-hosted monthly = power cost only. Hardware is one-time purchase shown in GPU table. Managed services quoted separately (*)"
+  }
+}

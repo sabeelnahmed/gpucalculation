@@ -1,0 +1,444 @@
+{
+  "_metadata": {
+    "last_updated": "2026-03-17",
+    "version": "2.0",
+    "notes": "Complete NVIDIA GPU catalog for LLM workloads. Organized into 4 tiers: Consumer (GeForce RTX), Professional Workstation (RTX PRO), Data Center Inference (L-series), Data Center Training+Inference (H/B-series). Prices are approximate market rates as of Q1 2026.",
+    "key_insight": "Our value is decluttering this. NVIDIA sells 30+ GPU SKUs. For LLM inference, only ~12 matter. We filter, recommend, and size."
+  },
+
+  "tier_1_consumer": {
+    "_description": "GeForce RTX — gaming GPUs repurposed for AI. Cheapest entry point. No ECC, no NVLink, consumer EULA restricts data center use. Best for: prototyping, small teams, pilot projects, on-desk deployments.",
+    "_caveats": [
+      "No ECC memory — rare bit-flip errors possible in long runs",
+      "NVIDIA EULA technically prohibits data center deployment for GeForce cards",
+      "No NVLink — multi-GPU only via PCIe (much slower)",
+      "Consumer cooling — not designed for 24/7 rack operation",
+      "No MIG — cannot partition GPU for multiple users",
+      "No vGPU support"
+    ],
+    "gpus": {
+      "rtx_4090": {
+        "name": "GeForce RTX 4090",
+        "architecture": "Ada Lovelace",
+        "status": "Current — widely available, prices rising",
+        "vram_gb": 24,
+        "memory_type": "GDDR6X",
+        "memory_bandwidth_gb_s": 1008,
+        "cuda_cores": 16384,
+        "tensor_cores": 512,
+        "fp16_bf16_tflops": 330,
+        "fp8_tflops": 660,
+        "tdp_watts": 450,
+        "pcie": "Gen 4 x16",
+        "nvlink": false,
+        "ecc": false,
+        "purchase_price_usd": { "msrp": 1599, "street_2026": "2000-2500" },
+        "cloud_hourly_usd": { "runpod": 0.69, "vast_ai": 0.34, "fluence": 0.55 },
+        "llm_capability": {
+          "7b_fp16": "yes — fast, ~80-120 tok/s",
+          "13b_fp16": "tight — fits but limited headroom",
+          "13b_int8": "yes — comfortable",
+          "30b_int4": "yes — ~20-30 tok/s",
+          "70b_int4": "barely — requires CPU offload, ~7-12 tok/s",
+          "70b_fp16": "no — needs 140GB"
+        },
+        "best_for": "Prototyping, small team chatbots, 7-13B model serving, budget inference"
+      },
+      "rtx_5090": {
+        "name": "GeForce RTX 5090",
+        "architecture": "Blackwell",
+        "status": "New — high demand, prices inflated",
+        "vram_gb": 32,
+        "memory_type": "GDDR7",
+        "memory_bandwidth_gb_s": 1792,
+        "cuda_cores": 21760,
+        "tensor_cores": 680,
+        "fp16_bf16_tflops": 419,
+        "fp8_tflops": 838,
+        "fp4_tflops": 1676,
+        "tdp_watts": 575,
+        "pcie": "Gen 5 x16",
+        "nvlink": false,
+        "ecc": false,
+        "purchase_price_usd": { "msrp": 1999, "street_2026": "2500-3500" },
+        "cloud_hourly_usd": { "runpod": 0.89, "vast_ai": 0.50, "cloudrift": 0.75 },
+        "llm_capability": {
+          "7b_fp16": "yes — blazing fast, outperforms A100",
+          "13b_fp16": "yes — comfortable with headroom",
+          "30b_int4": "yes — fast, ~35-45 tok/s",
+          "30b_int8": "yes — fits in 32GB",
+          "70b_int4": "yes — fits fully, ~15-25 tok/s, no offload needed",
+          "70b_fp16": "no — needs 140GB"
+        },
+        "best_for": "Best consumer GPU for AI in 2026. 28% faster than 4090. Runs 70B INT4 without CPU offload.",
+        "benchmark_notes": "Outperforms A100 80GB by 2.6x on 7B inference. At $0.89/hr cloud, 2x 5090 matches H100 throughput at lower cost."
+      },
+      "rtx_5080": {
+        "name": "GeForce RTX 5080",
+        "architecture": "Blackwell",
+        "status": "New — available",
+        "vram_gb": 16,
+        "memory_type": "GDDR7",
+        "memory_bandwidth_gb_s": 960,
+        "cuda_cores": 10752,
+        "tensor_cores": 336,
+        "tdp_watts": 360,
+        "pcie": "Gen 5 x16",
+        "nvlink": false,
+        "ecc": false,
+        "purchase_price_usd": { "msrp": 999, "street_2026": "1200-1400" },
+        "llm_capability": {
+          "7b_int4": "yes",
+          "7b_fp16": "yes — tight",
+          "13b_int4": "yes",
+          "13b_int8": "tight",
+          "30b_int4": "no — 16GB insufficient"
+        },
+        "best_for": "Budget entry for 7-13B models. Good for experimentation."
+      }
+    }
+  },
+
+  "tier_2_workstation": {
+    "_description": "RTX PRO / Workstation — professional GPUs with ECC, pro drivers, and enterprise support. Legal for data center use. Best for: on-desk enterprise AI, single-GPU large model deployment, professional reliability.",
+    "_advantages_over_consumer": [
+      "ECC memory — bit-flip protection for 24/7 reliability",
+      "Professional drivers — certified for enterprise software",
+      "No EULA restrictions on data center deployment",
+      "Better thermal design for sustained workloads",
+      "ISV certifications for enterprise applications",
+      "MIG support on some models"
+    ],
+    "gpus": {
+      "rtx_6000_ada": {
+        "name": "RTX 6000 Ada Generation",
+        "architecture": "Ada Lovelace",
+        "status": "Current — widely available",
+        "vram_gb": 48,
+        "memory_type": "GDDR6 with ECC",
+        "memory_bandwidth_gb_s": 960,
+        "cuda_cores": 18176,
+        "tensor_cores": 568,
+        "fp16_bf16_tflops": 362,
+        "tdp_watts": 300,
+        "pcie": "Gen 4 x16",
+        "nvlink": "NVLink bridge (2 GPUs only)",
+        "ecc": true,
+        "purchase_price_usd": { "msrp": 6800, "street_2026": "4500-5300" },
+        "cloud_hourly_usd": { "runpod": 0.77, "vast_ai": 0.60 },
+        "llm_capability": {
+          "7b_fp16": "yes — fast",
+          "13b_fp16": "yes — comfortable",
+          "30b_int8": "yes — fits in 48GB",
+          "30b_int4": "yes — with KV cache room",
+          "70b_int4": "yes — ~13-18 tok/s, single GPU, no offload",
+          "70b_fp16": "no — needs 140GB"
+        },
+        "best_for": "Enterprise 70B INT4 on single GPU with ECC reliability. Workhorse for workstation AI."
+      },
+      "rtx_a6000": {
+        "name": "RTX A6000 (previous gen)",
+        "architecture": "Ampere",
+        "status": "Legacy — still available, prices dropping",
+        "vram_gb": 48,
+        "memory_type": "GDDR6 with ECC",
+        "memory_bandwidth_gb_s": 768,
+        "cuda_cores": 10752,
+        "tensor_cores": 336,
+        "tdp_watts": 300,
+        "pcie": "Gen 4 x16",
+        "nvlink": "NVLink bridge (2 GPUs only)",
+        "ecc": true,
+        "purchase_price_usd": { "street_2026": "3000-4000" },
+        "llm_capability": {
+          "13b_fp16": "yes",
+          "30b_int8": "yes",
+          "70b_int4": "yes — slower than 6000 Ada"
+        },
+        "best_for": "Budget workstation option for 30-70B INT4. Good value on secondary market."
+      },
+      "rtx_pro_6000_blackwell": {
+        "name": "RTX PRO 6000 Blackwell Workstation Edition",
+        "architecture": "Blackwell",
+        "status": "New — shipping H1 2026, high demand",
+        "vram_gb": 96,
+        "memory_type": "GDDR7 with ECC",
+        "memory_bandwidth_gb_s": 1800,
+        "cuda_cores": 24064,
+        "tensor_cores": "5th gen",
+        "fp16_bf16_tflops": "~500 (estimated)",
+        "fp4_tflops": 4000,
+        "tdp_watts": 600,
+        "pcie": "Gen 5 x16",
+        "nvlink": false,
+        "ecc": true,
+        "mig": "up to 4 instances (Max-Q variant)",
+        "purchase_price_usd": { "msrp": 8000, "street_2026": "7900-8500" },
+        "cloud_hourly_usd": { "cloudrift": 1.50 },
+        "llm_capability": {
+          "7b_fp16": "yes — extremely fast",
+          "13b_fp16": "yes — extremely fast",
+          "30b_fp16": "yes — comfortable",
+          "70b_int8": "yes — fits in 96GB, single GPU!",
+          "70b_fp16": "tight — 140GB needed, requires some offload",
+          "70b_int4": "yes — blazing fast, tons of KV cache room"
+        },
+        "best_for": "GAME CHANGER. 96GB on a workstation card. Runs 70B INT8 on a single desktop GPU. No data center needed. Nearly matches RTX 5090 in raw throughput with 3x the VRAM.",
+        "benchmark_notes": "3.7x faster than RTX 4090 on single-chip inference. Competitive with H100 for many workloads at 1/3 the price."
+      },
+      "rtx_pro_6000_blackwell_server": {
+        "name": "RTX PRO 6000 Blackwell Server Edition",
+        "architecture": "Blackwell",
+        "status": "New — shipping H1 2026",
+        "vram_gb": 96,
+        "memory_type": "GDDR7 with ECC",
+        "memory_bandwidth_gb_s": 1800,
+        "cuda_cores": 24064,
+        "tdp_watts": 600,
+        "form_factor": "Single-slot liquid-cooled for rack deployment",
+        "pcie": "Gen 6",
+        "ecc": true,
+        "purchase_price_usd": { "estimated": "9000-12000" },
+        "best_for": "Rack-mounted enterprise inference. 8-GPU RTX PRO Server configs available for dense AI serving.",
+        "notes": "Server variant of the workstation card, designed for 24/7 rack operation with liquid cooling."
+      }
+    }
+  },
+
+  "tier_3_datacenter_inference": {
+    "_description": "NVIDIA Data Center GPUs optimized for inference. PCIe form factor, moderate power, designed for rack deployment. Best for: production inference serving, cost-optimized deployments.",
+    "gpus": {
+      "l4": {
+        "name": "NVIDIA L4",
+        "architecture": "Ada Lovelace",
+        "status": "Current — widely available",
+        "vram_gb": 24,
+        "memory_type": "GDDR6",
+        "memory_bandwidth_gb_s": 300,
+        "tensor_cores": "4th gen",
+        "fp8_tflops": 242,
+        "tdp_watts": 72,
+        "pcie": "Gen 4 x16, low-profile",
+        "nvlink": false,
+        "ecc": true,
+        "mig": false,
+        "purchase_price_usd": { "low": 2000, "mid": 2800, "high": 4000 },
+        "cloud_hourly_usd": { "gcp": 0.70, "aws": 0.80 },
+        "llm_capability": {
+          "7b_int4": "yes — good throughput",
+          "7b_fp16": "tight",
+          "13b_int4": "yes",
+          "13b_int8": "tight"
+        },
+        "best_for": "Scale-out 7B inference fleets. Ultra low power (72W). Dense rack packing. Edge deployment."
+      },
+      "l40s": {
+        "name": "NVIDIA L40S",
+        "architecture": "Ada Lovelace",
+        "status": "Current — widely available",
+        "vram_gb": 48,
+        "memory_type": "GDDR6 with ECC",
+        "memory_bandwidth_gb_s": 864,
+        "cuda_cores": 18176,
+        "tensor_cores": 568,
+        "fp16_bf16_tflops": 362,
+        "fp8_tflops": 1466,
+        "tdp_watts": 350,
+        "pcie": "Gen 4 x16",
+        "nvlink": false,
+        "ecc": true,
+        "mig": false,
+        "purchase_price_usd": { "low": 7000, "mid": 8500, "high": 10000 },
+        "cloud_hourly_usd": { "aws": 1.85, "lambda": 0.94, "coreweave": 0.86, "vast_ai": 0.40 },
+        "llm_capability": {
+          "7b_fp16": "yes — fast",
+          "13b_fp16": "yes",
+          "30b_int8": "yes",
+          "70b_int4": "tight — possible with careful memory management",
+          "mixtral_8x7b_int4": "yes"
+        },
+        "best_for": "Best cost-per-token for 7-30B models. Sleeper pick for inference. $0.40-1.85/hr. FP8 via Transformer Engine makes it surprisingly competitive."
+      }
+    }
+  },
+
+  "tier_4_datacenter_flagship": {
+    "_description": "NVIDIA Data Center Flagships — HBM memory, NVLink, MIG, designed for both training and inference at scale. The highest performance tier. Best for: production scale, training, fine-tuning, large models, multi-tenant serving.",
+    "gpus": {
+      "a100_80gb": {
+        "name": "NVIDIA A100 80GB SXM",
+        "architecture": "Ampere",
+        "status": "Legacy / EOL — widely available on secondary market and cloud",
+        "vram_gb": 80,
+        "memory_type": "HBM2e",
+        "memory_bandwidth_gb_s": 2039,
+        "fp16_bf16_tflops": 312,
+        "int8_tops": 624,
+        "tdp_watts": 400,
+        "nvlink": true,
+        "nvlink_bandwidth_gb_s": 600,
+        "ecc": true,
+        "mig": true,
+        "mig_max_instances": 7,
+        "purchase_price_usd": { "low": 12000, "mid": 15000, "high": 20000 },
+        "cloud_hourly_usd": { "aws": 3.93, "gcp": 3.67, "azure": 3.67, "lambda": 1.29, "coreweave": 1.21, "vast_ai": 0.75 },
+        "llm_capability": {
+          "7b_fp16": "yes",
+          "13b_fp16": "yes",
+          "30b_fp16": "yes — comfortable",
+          "70b_int8": "yes — fits in 80GB",
+          "70b_int4": "yes — with KV cache room",
+          "70b_fp16": "no — needs 2 GPUs"
+        },
+        "best_for": "Budget data center option. Sub-$1/hr on marketplace. Good for fine-tuning under 13B, batch inference."
+      },
+      "h100_sxm": {
+        "name": "NVIDIA H100 80GB SXM",
+        "architecture": "Hopper",
+        "status": "Current mainstream workhorse",
+        "vram_gb": 80,
+        "memory_type": "HBM3",
+        "memory_bandwidth_gb_s": 3350,
+        "fp16_bf16_tflops": 989,
+        "fp8_tflops": 1979,
+        "int8_tops": 1979,
+        "tdp_watts": 700,
+        "nvlink": true,
+        "nvlink_bandwidth_gb_s": 900,
+        "ecc": true,
+        "mig": true,
+        "mig_max_instances": 7,
+        "purchase_price_usd": { "low": 25000, "mid": 30000, "high": 40000 },
+        "cloud_hourly_usd": { "aws": 3.93, "gcp": 3.00, "azure": 6.98, "lambda": 2.49, "coreweave": 2.23, "datacrunch": 1.99, "vast_ai": 1.49 },
+        "llm_capability": {
+          "7b_fp16": "yes — extremely fast",
+          "13b_fp16": "yes — extremely fast",
+          "30b_fp16": "yes",
+          "70b_int8": "yes — production grade",
+          "70b_int4": "yes — with large KV cache room",
+          "70b_fp16": "no — needs 2× H100",
+          "405b_int4": "needs 4-6 GPUs"
+        },
+        "best_for": "The workhorse. Best price-to-performance for production LLM workloads. 2.4x training speedup over A100."
+      },
+      "h200_sxm": {
+        "name": "NVIDIA H200 141GB SXM",
+        "architecture": "Hopper",
+        "status": "Current high-end — ramping availability",
+        "vram_gb": 141,
+        "memory_type": "HBM3e",
+        "memory_bandwidth_gb_s": 4800,
+        "fp16_bf16_tflops": 989,
+        "fp8_tflops": 1979,
+        "int8_tops": 1979,
+        "tdp_watts": 700,
+        "nvlink": true,
+        "nvlink_bandwidth_gb_s": 900,
+        "ecc": true,
+        "mig": true,
+        "purchase_price_usd": { "low": 30000, "mid": 35000, "high": 42000 },
+        "cloud_hourly_usd": { "aws": 10.60, "gcp_spot": 3.72, "lambda": 3.29, "coreweave": 3.49, "gmi_cloud": 2.50, "jarvislabs": 3.80 },
+        "llm_capability": {
+          "70b_fp16": "YES — single GPU! This is the breakthrough.",
+          "70b_int8": "yes — with massive KV cache room for long context",
+          "70b_int4": "yes — extreme headroom",
+          "405b_int4": "needs 2-3 GPUs",
+          "mixtral_8x22b_fp16": "needs 3 GPUs"
+        },
+        "best_for": "70B FP16 on ONE GPU. Eliminates multi-GPU complexity. 42% faster than H100 on Llama 70B inference. Best for long context (32K+)."
+      },
+      "b200_sxm": {
+        "name": "NVIDIA B200 192GB SXM",
+        "architecture": "Blackwell",
+        "status": "New generation — limited availability, ramping through 2026",
+        "vram_gb": 192,
+        "memory_type": "HBM3e",
+        "memory_bandwidth_gb_s": 8000,
+        "fp16_bf16_tflops": 2250,
+        "fp8_tflops": 4500,
+        "fp4_tflops": 9000,
+        "tdp_watts": 1000,
+        "nvlink": true,
+        "nvlink_bandwidth_gb_s": 1800,
+        "ecc": true,
+        "mig": true,
+        "cooling": "Liquid cooling required",
+        "purchase_price_usd": { "low": 40000, "mid": 45000, "high": 60000 },
+        "cloud_hourly_usd": { "lambda": 5.49, "datacrunch": 3.99 },
+        "llm_capability": {
+          "70b_fp16": "yes — single GPU with massive headroom",
+          "100b_fp16": "yes — single GPU",
+          "405b_int4": "yes — 2 GPUs",
+          "405b_fp16": "needs 5-6 GPUs"
+        },
+        "best_for": "Maximum throughput. 4-5x H100 inference speed. 100B+ models on single GPU. Future-proof for 2-3 years."
+      },
+      "b300_sxm": {
+        "name": "NVIDIA B300 288GB SXM (Blackwell Ultra)",
+        "architecture": "Blackwell Ultra",
+        "status": "Announced — shipping H2 2025/2026",
+        "vram_gb": 288,
+        "memory_type": "HBM3e (12-high stacks)",
+        "memory_bandwidth_gb_s": 8000,
+        "fp4_tflops": 15000,
+        "tdp_watts": 1400,
+        "nvlink": true,
+        "nvlink_bandwidth_gb_s": 1800,
+        "ecc": true,
+        "cooling": "Liquid cooling required",
+        "purchase_price_usd": { "estimated": "50000-70000" },
+        "llm_capability": {
+          "70b_fp16": "yes — trivial",
+          "405b_int8": "yes — single GPU!",
+          "405b_fp16": "needs 3 GPUs"
+        },
+        "best_for": "Frontier compute. 405B INT8 on a single GPU. 1.5x B200 performance. For organizations with no budget constraints."
+      }
+    }
+  },
+
+  "product_image_urls": {
+    "_notes": "Save these images locally from NVIDIA product pages for the configurator UI. Right-click → Save Image on each page.",
+    "rtx_4090": "https://www.nvidia.com/en-us/geforce/graphics-cards/40-series/rtx-4090/",
+    "rtx_5090": "https://www.nvidia.com/en-us/geforce/graphics-cards/50-series/rtx-5090/",
+    "rtx_6000_ada": "https://www.nvidia.com/en-us/design-visualization/rtx-6000/",
+    "rtx_pro_6000_blackwell": "https://www.nvidia.com/en-us/products/workstations/professional-desktop-gpus/rtx-pro-6000/",
+    "rtx_pro_6000_server": "https://www.nvidia.com/en-us/data-center/rtx-pro-6000-blackwell-server-edition/",
+    "l4": "https://www.nvidia.com/en-us/data-center/l4/",
+    "l40s": "https://www.nvidia.com/en-us/data-center/l40/",
+    "a100": "https://www.nvidia.com/en-us/data-center/a100/",
+    "h100": "https://www.nvidia.com/en-us/data-center/h100/",
+    "h200": "https://www.nvidia.com/en-us/data-center/h200/",
+    "b200": "https://www.nvidia.com/en-us/data-center/dgx-b200/",
+    "nvidia_press_kit": "https://nvidianews.nvidia.com/media-gallery"
+  },
+
+  "selection_guide": {
+    "by_budget": {
+      "under_2000_usd": ["rtx_4090", "rtx_5080"],
+      "2000_to_5000_usd": ["rtx_5090", "rtx_a6000", "l4"],
+      "5000_to_10000_usd": ["rtx_6000_ada", "rtx_pro_6000_blackwell", "l40s"],
+      "10000_to_20000_usd": ["a100_80gb", "rtx_pro_6000_server"],
+      "20000_to_40000_usd": ["h100_sxm", "h200_sxm"],
+      "40000_plus_usd": ["b200_sxm", "b300_sxm"]
+    },
+    "by_model_size": {
+      "7b_models": ["l4", "rtx_5080", "rtx_4090", "rtx_5090"],
+      "13b_models": ["rtx_4090", "rtx_5090", "l40s", "rtx_6000_ada"],
+      "30b_models": ["rtx_5090", "l40s", "rtx_6000_ada", "rtx_pro_6000_blackwell", "a100_80gb"],
+      "70b_models": ["rtx_pro_6000_blackwell", "h100_sxm", "h200_sxm", "b200_sxm"],
+      "100b_plus_models": ["h200_sxm", "b200_sxm", "b300_sxm"],
+      "405b_models": ["b200_sxm (multi-GPU)", "b300_sxm"]
+    },
+    "by_use_case": {
+      "prototype_pilot": ["rtx_4090", "rtx_5090"],
+      "small_team_internal": ["rtx_5090", "rtx_6000_ada", "rtx_pro_6000_blackwell"],
+      "production_inference": ["l40s", "h100_sxm", "h200_sxm"],
+      "enterprise_scale": ["h100_sxm", "h200_sxm", "b200_sxm"],
+      "fine_tuning": ["a100_80gb", "h100_sxm", "h200_sxm"],
+      "training_from_scratch": ["h100_sxm", "h200_sxm", "b200_sxm"],
+      "on_desk_deployment": ["rtx_pro_6000_blackwell"],
+      "edge_deployment": ["l4"]
+    }
+  }
+}

@@ -1,0 +1,127 @@
+{
+  "_metadata": {
+    "last_updated": "2026-03-17",
+    "notes": "Operational costs for running self-hosted GPU infrastructure. Saudi Arabia specific where applicable."
+  },
+  "electricity": {
+    "saudi_arabia": {
+      "industrial_kwh_sar": 0.048,
+      "commercial_kwh_sar": 0.20,
+      "notes": "Industrial rate for data centers; commercial rate for office setups. Saudi electricity is heavily subsidized."
+    },
+    "uae": {
+      "industrial_kwh_usd": 0.08
+    },
+    "us_average": {
+      "industrial_kwh_usd": 0.07
+    },
+    "europe_average": {
+      "industrial_kwh_usd": 0.15
+    }
+  },
+  "cooling": {
+    "pue_factor": {
+      "excellent_datacenter": 1.2,
+      "good_datacenter": 1.4,
+      "average_datacenter": 1.6,
+      "office_server_room": 2.0,
+      "notes": "Power Usage Effectiveness: multiply GPU power by PUE to get total facility power. E.g., 700W GPU × 1.4 PUE = 980W total"
+    },
+    "liquid_cooling_required": ["b200_sxm"],
+    "air_cooling_sufficient": ["a100_80gb", "h100_sxm", "h200_sxm", "l40s", "l4"],
+    "notes": "B200 at 1000W TDP generally requires direct liquid cooling. H100/H200 at 700W can use air cooling but liquid is recommended for dense deployments."
+  },
+  "networking": {
+    "infiniband_per_port_usd": 1500,
+    "nvlink_switch_per_node_usd": 5000,
+    "ethernet_100gbe_per_port_usd": 500,
+    "notes": "Multi-GPU tensor parallelism within a node uses NVLink (included in DGX/HGX). Cross-node pipeline parallelism benefits from InfiniBand."
+  },
+  "storage": {
+    "nvme_ssd_per_tb_usd": 100,
+    "enterprise_ssd_per_tb_usd": 200,
+    "recommended_per_model": {
+      "small_7b": "500 GB (model weights + datasets + checkpoints)",
+      "medium_30b": "2 TB",
+      "large_70b": "4 TB",
+      "xlarge_100b_plus": "8-16 TB"
+    }
+  },
+  "server_hardware": {
+    "dgx_h100_8gpu": {
+      "price_usd": 300000,
+      "includes": "8× H100 SXM, 2× Intel Xeon or AMD EPYC CPUs, 2TB RAM, NVLink switch, 10TB NVMe",
+      "notes": "All-in-one solution; most expensive but simplest to deploy"
+    },
+    "hgx_h100_8gpu_custom": {
+      "price_usd": 250000,
+      "includes": "8× H100 SXM baseboard; requires custom server chassis, CPU, RAM",
+      "notes": "Cheaper than DGX but requires system integration"
+    },
+    "single_gpu_server": {
+      "price_usd_without_gpu": 5000,
+      "includes": "Server chassis, CPU, 128GB RAM, NVMe storage, PSU",
+      "notes": "Add GPU cost on top. Suitable for 1-2 GPU setups."
+    }
+  },
+  "managed_service_fees": {
+    "notes": "Suggested pricing tiers for your managed service offering",
+    "tiers": {
+      "basic": {
+        "monthly_sar": 5000,
+        "includes": "Monitoring, uptime alerts, monthly model updates"
+      },
+      "standard": {
+        "monthly_sar": 15000,
+        "includes": "Basic + fine-tuning updates, performance optimization, priority support"
+      },
+      "enterprise": {
+        "monthly_sar": 30000,
+        "includes": "Standard + dedicated engineer, custom model development, SLA guarantees"
+      }
+    }
+  },
+  "exchange_rates": {
+    "usd_to_sar": 3.75,
+    "usd_to_aed": 3.67,
+    "notes": "SAR is pegged to USD at 3.75"
+  },
+  "constants": {
+    "hours_per_month": 730,
+    "hours_per_year": 8760,
+    "typical_gpu_utilization_inference": 0.65,
+    "typical_gpu_utilization_training": 0.85
+  },
+  "tco_calculation": {
+    "on_premise_monthly": {
+      "formula": "gpu_depreciation + electricity + cooling + networking + storage + rack_space + managed_service",
+      "gpu_depreciation_months": 36,
+      "notes": "Typical 3-year depreciation for GPU hardware"
+    },
+    "cloud_monthly": {
+      "formula": "gpu_hours × hourly_rate × hours_per_month",
+      "notes": "Add egress fees ($0.08-0.12/GB for hyperscalers) and storage costs"
+    },
+    "breakeven_formula": "on_premise_total_cost / (cloud_monthly_cost - on_premise_monthly_operating_cost)",
+    "typical_breakeven_months": "12-18 months for high-utilization workloads"
+  },
+  "saudi_specific": {
+    "data_centers_in_region": [
+      "AWS Middle East (Bahrain) — closest to KSA",
+      "Oracle Cloud (Jeddah) — Saudi region",
+      "Google Cloud (Doha) — nearby",
+      "STC Cloud — Saudi local provider",
+      "Alibaba Cloud (Riyadh) — planned/available"
+    ],
+    "regulations": {
+      "pdpl": "Personal Data Protection Law — mandates sensitive data stored in-Kingdom",
+      "sdaia": "Saudi Data and AI Authority — governs AI deployment",
+      "global_ai_hub_law": "Draft law allowing 'data embassies' — foreign entities can host under their own legal jurisdiction within Saudi territory"
+    },
+    "gpu_import_considerations": {
+      "us_export_controls": "NVIDIA H100/H200/B200 are subject to US export control regulations. Saudi Arabia is in Tier 2 under the AI Diffusion Rule, meaning GPUs can be imported but with licensing requirements for large clusters.",
+      "alternative_sources": "Some organizations source through UAE or other intermediaries",
+      "notes": "Verify current export control status before large purchases"
+    }
+  }
+}
